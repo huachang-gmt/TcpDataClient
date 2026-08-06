@@ -18,7 +18,10 @@
  *============================================================================*/
 
 /* Default TCP Server Address */
-#define TCP_DEFAULT_SERVER_IP                "127.0.0.1"
+//#define TCP_DEFAULT_SERVER_IP                "127.0.0.1"
+
+/* 增加連接到 Raspberry Pi CM5 IP 位址 */
+#define TCP_DEFAULT_SERVER_IP                "192.168.137.200"
 
 /* Default TCP Server Port */
 #define TCP_DEFAULT_SERVER_PORT              (7777U)
