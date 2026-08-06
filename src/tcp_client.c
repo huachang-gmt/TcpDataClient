@@ -50,9 +50,55 @@
 
 #include <windows.h>
 
+
+/*
+ * High-resolution Windows timer.
+ *
+ * GetTickCount64() has a relatively coarse effective resolution
+ * and is therefore unsuitable for the required 1 ms transmission
+ * scheduling.
+ *
+ * QueryPerformanceCounter() provides a high-resolution,
+ * monotonic timer suitable for this purpose.
+ */
+
+static LARGE_INTEGER s_qpc_frequency;
+
+
+/**
+ * @brief Get high-resolution monotonic time in milliseconds.
+ *
+ * @return Current monotonic time in milliseconds.
+ */
 static uint64_t tcp_client_get_time_ms(void)
 {
-    return (uint64_t)GetTickCount64();
+    LARGE_INTEGER counter;
+
+    if (!QueryPerformanceCounter(&counter))
+    {
+        return 0ULL;
+    }
+
+    return
+        ((uint64_t)counter.QuadPart * 1000ULL) /
+        (uint64_t)s_qpc_frequency.QuadPart;
+}
+
+
+/**
+ * @brief Initialize Windows high-resolution timer.
+ *
+ * @return TRUE if successful.
+ */
+static bool tcp_client_initialize_timer(void)
+{
+    if (!QueryPerformanceFrequency(
+            &s_qpc_frequency))
+    {
+        return false;
+    }
+
+    return true;
 }
 
 #elif TCP_PLATFORM_LINUX
@@ -742,6 +788,20 @@ tcp_result_t tcp_client_initialize(
     {
         return result;
     }
+
+#if TCP_PLATFORM_WINDOWS
+
+    /*
+     * Initialize high-resolution timer used by
+     * transmission scheduling.
+     */
+    if (!tcp_client_initialize_timer())
+    {
+        return TCP_RESULT_ERROR;
+    }
+
+#endif
+
 
     /*
      * Always start from a clean context.

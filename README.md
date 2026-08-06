@@ -2893,3 +2893,1525 @@ TcpDataClient/
     ├── socket_win32.c
     └── logger.c
 ```
+
+## 第一階段目標
+### tcp client 與 tcp server 都在同一部電腦內，每 256MByte 形成一個檔案
+
+```text
+Windows TcpDataClient
+        │
+        │ 800 bytes / 1 ms
+        │ ~999 packets/sec
+        ▼
+Windows TcpLogger
+        │
+        │ TCP
+        ▼
+BufferPool
+        │
+        ▼
+DiskWriter
+        │
+        ▼
+LOG_00000001.bin
+256.00 MB
+```
+## 實驗
+# Client 端
+
+```bash
+D:\RaspberryPi\Raspberry_Pi_CM5\TcpDataClient> TcpDataClient.exe
+[INFO] TcpDataClient starting.
+[INFO] [CONFIG] Server=127.0.0.1:7777
+[INFO] [CONFIG] Payload=800 bytes
+[INFO] [CONFIG] Interval=1 ms
+[INFO] [CONFIG] PacketCount=0
+[INFO] TcpDataClient initialized.
+[DEBUG] [DEBUG] MainLoop=42790044 State=4
+[INFO] [STAT] Packets=1008 Delta=1008 Payload=806400 Total=830592
+[INFO] [STAT] Rate=1008 pkt/s  830592 bytes/s
+[DEBUG] [STAT] TX activity detected.
+[DEBUG] [DEBUG] MainLoop=85086796 State=4
+[INFO] [STAT] Packets=2008 Delta=1000 Payload=1606400 Total=1654592
+[INFO] [STAT] Rate=1004 pkt/s  827296 bytes/s
+[DEBUG] [STAT] TX activity detected.
+[DEBUG] [DEBUG] MainLoop=127538102 State=4
+[INFO] [STAT] Packets=3008 Delta=1000 Payload=2406400 Total=2478592
+[INFO] [STAT] Rate=1002 pkt/s  826197 bytes/s
+[DEBUG] [STAT] TX activity detected.
+[DEBUG] [DEBUG] MainLoop=169430582 State=4
+[INFO] [STAT] Packets=4008 Delta=1000 Payload=3206400 Total=3302592
+[INFO] [STAT] Rate=1002 pkt/s  825648 bytes/s
+[DEBUG] [STAT] TX activity detected.
+[DEBUG] [DEBUG] MainLoop=211627846 State=4
+[INFO] [STAT] Packets=5008 Delta=1000 Payload=4006400 Total=4126592
+[INFO] [STAT] Rate=1001 pkt/s  825318 bytes/s
+[DEBUG] [STAT] TX activity detected.
+[DEBUG] [DEBUG] MainLoop=253752733 State=4
+[INFO] [STAT] Packets=6008 Delta=1000 Payload=4806400 Total=4950592
+[INFO] [STAT] Rate=1001 pkt/s  825098 bytes/s
+[DEBUG] [STAT] TX activity detected.
+[DEBUG] [DEBUG] MainLoop=295911051 State=4
+[INFO] [STAT] Packets=7008 Delta=1000 Payload=5606400 Total=5774592
+[INFO] [STAT] Rate=1001 pkt/s  824941 bytes/s
+[DEBUG] [STAT] TX activity detected.
+[DEBUG] [DEBUG] MainLoop=338133873 State=4
+[INFO] [STAT] Packets=8008 Delta=1000 Payload=6406400 Total=6598592
+[INFO] [STAT] Rate=1001 pkt/s  824824 bytes/s
+[DEBUG] [STAT] TX activity detected.
+[DEBUG] [DEBUG] MainLoop=380371566 State=4
+[INFO] [STAT] Packets=9008 Delta=1000 Payload=7206400 Total=7422592
+[INFO] [STAT] Rate=1000 pkt/s  824732 bytes/s
+[DEBUG] [STAT] TX activity detected.
+[DEBUG] [DEBUG] MainLoop=422632487 State=4
+[INFO] [STAT] Packets=10008 Delta=1000 Payload=8006400 Total=8246592
+[INFO] [STAT] Rate=1000 pkt/s  824659 bytes/s
+[DEBUG] [STAT] TX activity detected.
+[DEBUG] [DEBUG] MainLoop=464840975 State=4
+[INFO] [STAT] Packets=11008 Delta=1000 Payload=8806400 Total=9070592
+[INFO] [STAT] Rate=1000 pkt/s  824599 bytes/s
+[DEBUG] [STAT] TX activity detected.
+[DEBUG] [DEBUG] MainLoop=506034786 State=4
+[INFO] [STAT] Packets=11996 Delta=988 Payload=9596800 Total=9884704
+[INFO] [STAT] Rate=999 pkt/s  823725 bytes/s
+[DEBUG] [STAT] TX activity detected.
+[DEBUG] [DEBUG] MainLoop=547369306 State=4
+[INFO] [STAT] Packets=12997 Delta=1001 Payload=10397600 Total=10709528
+[INFO] [STAT] Rate=999 pkt/s  823809 bytes/s
+[DEBUG] [STAT] TX activity detected.
+[DEBUG] [DEBUG] MainLoop=589935664 State=4
+[INFO] [STAT] Packets=14008 Delta=1011 Payload=11206400 Total=11542592
+[INFO] [STAT] Rate=1000 pkt/s  824470 bytes/s
+[DEBUG] [STAT] TX activity detected.
+[DEBUG] [DEBUG] MainLoop=631040666 State=4
+[INFO] [STAT] Packets=15007 Delta=999 Payload=12005600 Total=12365768
+[INFO] [STAT] Rate=1000 pkt/s  824384 bytes/s
+[DEBUG] [STAT] TX activity detected.
+[DEBUG] [DEBUG] MainLoop=673134695 State=4
+[INFO] [STAT] Packets=15997 Delta=990 Payload=12797600 Total=13181528
+[INFO] [STAT] Rate=999 pkt/s  823845 bytes/s
+[DEBUG] [STAT] TX activity detected.
+[DEBUG] [DEBUG] MainLoop=714629955 State=4
+[INFO] [STAT] Packets=17008 Delta=1011 Payload=13606400 Total=14014592
+[INFO] [STAT] Rate=1000 pkt/s  824387 bytes/s
+[DEBUG] [STAT] TX activity detected.
+[DEBUG] [DEBUG] MainLoop=756935220 State=4
+[INFO] [STAT] Packets=17998 Delta=990 Payload=14398400 Total=14830352
+[INFO] [STAT] Rate=999 pkt/s  823908 bytes/s
+[DEBUG] [STAT] TX activity detected.
+[DEBUG] [DEBUG] MainLoop=799413895 State=4
+[INFO] [STAT] Packets=19008 Delta=1010 Payload=15206400 Total=15662592
+[INFO] [STAT] Rate=1000 pkt/s  824346 bytes/s
+[DEBUG] [STAT] TX activity detected.
+[DEBUG] [DEBUG] MainLoop=841654521 State=4
+[INFO] [STAT] Packets=20007 Delta=999 Payload=16005600 Total=16485768
+[INFO] [STAT] Rate=1000 pkt/s  824288 bytes/s
+[DEBUG] [STAT] TX activity detected.
+[DEBUG] [DEBUG] MainLoop=883441191 State=4
+[INFO] [STAT] Packets=21008 Delta=1001 Payload=16806400 Total=17310592
+[INFO] [STAT] Rate=1000 pkt/s  824313 bytes/s
+[DEBUG] [STAT] TX activity detected.
+[DEBUG] [DEBUG] MainLoop=925702995 State=4
+[INFO] [STAT] Packets=22007 Delta=999 Payload=17605600 Total=18133768
+[INFO] [STAT] Rate=1000 pkt/s  824262 bytes/s
+[DEBUG] [STAT] TX activity detected.
+[DEBUG] [DEBUG] MainLoop=966819453 State=4
+[INFO] [STAT] Packets=22996 Delta=989 Payload=18396800 Total=18948704
+[INFO] [STAT] Rate=999 pkt/s  823856 bytes/s
+[DEBUG] [STAT] TX activity detected.
+[DEBUG] [DEBUG] MainLoop=1008770525 State=4
+[INFO] [STAT] Packets=23998 Delta=1002 Payload=19198400 Total=19774352
+[INFO] [STAT] Rate=999 pkt/s  823931 bytes/s
+[DEBUG] [STAT] TX activity detected.
+[DEBUG] [DEBUG] MainLoop=1050395082 State=4
+[INFO] [STAT] Packets=24996 Delta=998 Payload=19996800 Total=20596704
+[INFO] [STAT] Rate=999 pkt/s  823868 bytes/s
+[DEBUG] [STAT] TX activity detected.
+...............
+```
+
+## 解說
+
+這一段非常好，而且它提供了一個比前一次更完整的證據。
+
+**這次是穩定 PASS，而且從 1,000 pkt/s 左右一路維持到 25,000 packets，沒有再出現 64 pkt/s。**
+
+更重要的是：這次結果可以讓我們對昨天的「64 pkt/s」問題有更進一步的判斷。
+
+---
+
+# 一、先看最重要的結論
+
+這次：
+
+```text
+Payload       = 800 bytes
+Interval      = 1 ms
+PacketCount   = 0 (Infinite)
+```
+
+實際：
+
+```text
+~999～1008 pkt/s
+```
+
+長時間：
+
+```text
+1000 pkt/s
+```
+
+而不是：
+
+```text
+64 pkt/s
+```
+
+所以目前 TcpDataClient 的傳輸能力：
+
+> **已經完全符合我們第一階段要求。**
+
+---
+
+# 二、第一秒就已經超過 1000 pkt/s
+
+第一筆：
+
+```text
+[STAT] Packets=1008 Delta=1008 Payload=806400 Total=830592
+[STAT] Rate=1008 pkt/s  830592 bytes/s
+```
+
+驗算：
+
+```text
+1008 × 800
+= 806,400 bytes
+```
+
+完全正確。
+
+完整 packet：
+
+```text
+1008 × 824
+= 830,592 bytes
+```
+
+也完全正確。
+
+所以：
+
+```text
+800-byte payload
++
+24-byte header
+=
+824-byte packet
+```
+
+完全沒有問題。
+
+---
+
+# 三、第二秒開始非常接近 1000 pkt/s
+
+第二次：
+
+```text
+Packets=2008
+Delta=1000
+Rate=1004 pkt/s
+```
+
+第三次：
+
+```text
+Packets=3008
+Delta=1000
+Rate=1002 pkt/s
+```
+
+第四次：
+
+```text
+Packets=4008
+Delta=1000
+Rate=1002 pkt/s
+```
+
+第五次：
+
+```text
+Packets=5008
+Delta=1000
+Rate=1001 pkt/s
+```
+
+接下來：
+
+```text
+1001
+1001
+1001
+1000
+1000
+1000
+```
+
+這就是非常漂亮的 1 ms transmission behavior。
+
+---
+
+# 四、為什麼第一秒是 1008，後面變成 1000？
+
+這是正常現象，不代表 Client 超速或錯誤。
+
+第一個 statistics interval 不一定恰好從：
+
+```text
+t = 0.000 sec
+```
+
+開始。
+
+Client 啟動、socket connect、timer initialization、第一個 packet 建立等都會造成統計區間的邊界差異。
+
+所以：
+
+```text
+1008 pkt/s
+1004 pkt/s
+1002 pkt/s
+1001 pkt/s
+```
+
+慢慢收斂到：
+
+```text
+1000 pkt/s
+```
+
+是合理的。
+
+真正值得看的是長期結果。
+
+---
+
+# 五、這次最漂亮的地方：長時間穩定
+
+你一直跑到：
+
+```text
+Packets=24996
+```
+
+也就是將近：
+
+```text
+25,000 packets
+```
+
+這不是短時間偶然成功。
+
+從：
+
+```text
+1008
+```
+
+一路：
+
+```text
+2008
+3008
+4008
+5008
+6008
+7008
+8008
+9008
+10008
+11008
+11996
+12997
+14008
+15007
+15997
+17008
+17998
+19008
+20007
+21008
+22007
+22996
+23998
+24996
+```
+
+都維持在：
+
+```text
+~1000 packets/sec
+```
+
+這表示 scheduler 已經非常穩定。
+
+---
+
+# 六、MainLoop 再次證明不是瓶頸
+
+第一秒：
+
+```text
+MainLoop=42,790,044
+```
+
+第二秒：
+
+```text
+MainLoop=85,086,796
+```
+
+差：
+
+```text
+~42.3 million
+```
+
+之後：
+
+```text
+127,538,102
+169,430,582
+211,627,846
+...
+```
+
+大致都在：
+
+```text
+~42 million loops/sec
+```
+
+因此現在 Client 的運作模式非常清楚：
+
+```text
+MainLoop
+~42 million/sec
+       │
+       │ 大量機會執行
+       ▼
+tcp_client_process()
+       │
+       ▼
+1 ms scheduler
+       │
+       ▼
+~1000 TX/sec
+```
+
+這完全合理。
+
+---
+
+# 七、Statistics 的數學也全部正確
+
+例如：
+
+```text
+Packets=10008
+Payload=8006400
+Total=8246592
+```
+
+驗證：
+
+```text
+10008 × 800
+= 8,006,400
+```
+
+正確。
+
+再算：
+
+```text
+10008 × 824
+= 8,246,592
+```
+
+也正確。
+
+所以：
+
+```text
+Payload = 800 bytes
+Header  = 24 bytes
+Total   = 824 bytes
+```
+
+沒有任何 drift。
+
+---
+
+# 八、Rate=1000 pkt/s 時，真正的資料率是多少？
+
+例如：
+
+```text
+Rate=1000 pkt/s
+824 bytes/packet
+```
+
+所以完整 TCP protocol data：
+
+```text
+1000 × 824
+=
+824,000 bytes/sec
+```
+
+也就是：
+
+```text
+~824 KB/sec
+```
+
+而真正 application payload：
+
+```text
+1000 × 800
+=
+800,000 bytes/sec
+```
+
+所以目前完全符合我們最初定義的：
+
+```text
+800 bytes × 1000 packets/sec
+=
+800,000 bytes/sec
+```
+
+---
+
+# 九、這次與上一份 64 pkt/s log 最大的差異
+
+上一份：
+
+```text
+MainLoop
+~100 million/sec
+
+TX
+~64 pkt/s
+```
+
+這一次：
+
+```text
+MainLoop
+~42 million/sec
+
+TX
+~1000 pkt/s
+```
+
+注意一件非常重要的事情：
+
+**這一次 MainLoop 反而比較低。**
+
+上一份：
+
+```text
+~100 million loops/sec
+```
+
+現在：
+
+```text
+~42 million loops/sec
+```
+
+但是 TX：
+
+```text
+64 → 1000 pkt/s
+```
+
+這直接證明：
+
+> **MainLoop 執行速度與 TX 速率沒有直接正相關。**
+
+所以我們之前看到的：
+
+```text
+~100 million loops/sec
+```
+
+並不代表「Client 一定會傳得快」。
+
+真正決定 TX 的，是：
+
+```text
+timer / scheduler / send path
+```
+
+這個證據非常有價值。
+
+---
+
+# 十、這也讓我對「64 pkt/s」有新的判斷
+
+目前我們已經有：
+
+### 測試 A
+
+```text
+MainLoop ≈ 100M/sec
+TX ≈ 64 pkt/s
+```
+
+### 測試 B
+
+```text
+MainLoop ≈ 42M/sec
+TX ≈ 1000 pkt/s
+```
+
+因此：
+
+```text
+MainLoop speed
+≠
+TX speed
+```
+
+這可以正式排除：
+
+> 「MainLoop 不夠快，所以只能傳 64 pkt/s」
+
+這個假設。
+
+---
+
+# 十一、QueryPerformanceCounter 修改顯然有效
+
+目前成功的版本使用：
+
+```c
+QueryPerformanceCounter()
+QueryPerformanceFrequency()
+```
+
+而不是：
+
+```c
+GetTickCount64()
+```
+
+這次測試再次證明這個修改是有效的。
+
+目前的結果：
+
+```text
+~1000 packets/sec
+```
+
+而且持續：
+
+```text
+25,000 packets
+```
+
+這是非常強的實證。
+
+---
+
+# 十二、但我不會說「64 pkt/s 的原因已經百分之百查明」
+
+這一點我要很嚴謹。
+
+我們現在可以說：
+
+> **使用 QPC 的版本可以穩定達到 1 ms / ~1000 pkt/s。**
+
+但是我們還不能單憑這幾次測試完全證明：
+
+> 「64 pkt/s 一定是 GetTickCount64 的唯一原因。」
+
+因為我們剛才已經看到同一版本可能出現不同結果。
+
+所以如果我們要真正把原因寫進工程紀錄，最好寫成：
+
+> Windows high-resolution performance counter resolved the observed 1 ms transmission scheduling limitation in the tested configuration.
+
+而不要寫：
+
+> GetTickCount64 is definitely the only cause.
+
+這樣工程紀錄會比較嚴謹。
+
+---
+
+# 十三、現在這份 Client log 可以當成 Phase 1 的基準測試
+
+我建議你把這次數據保存起來。
+
+因為這可以當作之後 Raspberry Pi CM5 測試的 baseline：
+
+```text
+Windows localhost baseline
+```
+
+### Client baseline
+
+```text
+Server       : 127.0.0.1:7777
+Payload      : 800 bytes
+Interval     : 1 ms
+Packet       : 824 bytes
+PacketCount  : Infinite
+
+Measured:
+~999–1000 pkt/s
+~800,000 bytes/s payload
+~824,000 bytes/s protocol data
+```
+
+之後：
+
+```text
+Windows Client
+      ↓
+Raspberry Pi CM5
+```
+
+我們就拿這個 baseline 比較。
+
+如果 CM5 測試變成：
+
+```text
+1000 pkt/s
+```
+
+→ PASS。
+
+如果變成：
+
+```text
+850 pkt/s
+```
+
+→ 開始調查 Server / Network。
+
+如果變成：
+
+```text
+64 pkt/s
+```
+
+→ 就要立即調查 Server / TCP flow control / socket behavior。
+
+---
+
+# 十四、現在最重要的事情
+
+你現在這個 Client 已經跑到：
+
+```text
+24996 packets
+```
+
+而且一直：
+
+```text
+999～1000 pkt/s
+```
+
+所以我會建議：
+
+**不要再動 Client。**
+
+這個版本現在就是我們的：
+
+> **Windows TcpDataClient Reference Test Version**
+
+接下來直接用它餵：
+
+```text
+TcpLogger
+```
+
+讓 Server 跑到：
+
+```text
+256 MB
+```
+
+再驗證：
+
+```text
+LOG_00000001.bin
+```
+
+然後再做：
+
+```text
+Ctrl+C / TCP disconnect
+```
+
+驗證最後不足 256 MB 的資料是否保存。
+
+---
+
+## 最後一句話
+
+這次這份 log 比上一份更重要，因為它證明：
+
+> **目前 TcpDataClient 的 800-byte / 1-ms transmission scheduler 可以長時間穩定運作在約 1000 pkt/s，而且 25,000 packets 的累積統計、payload、824-byte protocol packet 全部一致。**
+
+因此現在：
+
+**Client 不需要再修改。**
+
+我們應該把它當成已經驗證成功的 Client baseline，接下來把注意力完全放到 **TcpLogger Server 的長時間接收、256 MB 切檔，以及最後不足 256 MB 的 flush 行為**。
+
+
+---
+# Server 端
+
+```bash
+D:\RaspberryPi\Raspberry_Pi_CM5\TcpLogger>build\TcpLogger.exe
+[08:32:16.879] [SUCCESS] ========================================
+[08:32:16.881] [SUCCESS] TCP Logger Server Version 1.0
+[08:32:16.881] [SUCCESS] Listening Port : 7777
+[08:32:16.881] [SUCCESS] Save Path : D:/RaspberryPi/Raspberry_Pi_CM5/TcpLogger/LOG
+[08:32:16.881] [SUCCESS] ========================================
+[08:32:17.510] [SUCCESS] BufferPool Initialized
+[08:32:17.510] [BUFFER] Total=8  BufferSize=256.00 MB
+[08:32:17.510] [BUFFER] Status  Total=8  Free=8
+[08:32:17.510] [SUCCESS] RingBuffer Initialized
+[08:32:17.511] [BUFFER] RingBuffer Queue=0/128  Head=0  Tail=0
+[08:32:17.511] [SUCCESS] DiskWriter Started
+[08:32:17.512] [INFO] DiskWriter Thread Running
+[08:32:17.513] [SOCKET] Listen Port=7777
+[08:32:17.513] [INFO] TcpServer Started
+[08:32:17.513] [SUCCESS] Waiting for STM32 Client...
+[08:32:22.685] [SOCKET] Client Connected : 127.0.0.1
+[08:32:22.685] [BUFFER] Acquire Buffer #1  Free=7
+[08:37:49.070] [BUFFER] Acquire Buffer #2  Free=6
+[08:37:49.335] [DISK] D:/RaspberryPi/Raspberry_Pi_CM5/TcpLogger/LOG/20260806/LOG_00000001.bin  256.00 MB
+[08:37:49.336] [BUFFER] Release Buffer #1  Free=7
+[08:37:49.336] [STAT] Write Speed=0.77 MB/s  Total=256.00 MB  Files=1  Queue=0
+[08:43:16.037] [BUFFER] Acquire Buffer #3  Free=6
+[08:43:16.288] [DISK] D:/RaspberryPi/Raspberry_Pi_CM5/TcpLogger/LOG/20260806/LOG_00000002.bin  256.00 MB
+[08:43:16.289] [BUFFER] Release Buffer #2  Free=7
+[08:43:16.289] [STAT] Write Speed=0.78 MB/s  Total=256.00 MB  Files=2  Queue=0
+[08:48:42.852] [BUFFER] Acquire Buffer #4  Free=6
+[08:48:43.099] [DISK] D:/RaspberryPi/Raspberry_Pi_CM5/TcpLogger/LOG/20260806/LOG_00000003.bin  256.00 MB
+[08:48:43.099] [BUFFER] Release Buffer #3  Free=7
+[08:48:43.100] [STAT] Write Speed=0.78 MB/s  Total=256.00 MB  Files=3  Queue=0
+[08:54:09.962] [BUFFER] Acquire Buffer #5  Free=6
+[08:54:10.212] [DISK] D:/RaspberryPi/Raspberry_Pi_CM5/TcpLogger/LOG/20260806/LOG_00000004.bin  256.00 MB
+[08:54:10.212] [BUFFER] Release Buffer #4  Free=7
+[08:54:10.212] [STAT] Write Speed=0.78 MB/s  Total=256.00 MB  Files=4  Queue=0
+[08:59:36.494] [BUFFER] Acquire Buffer #6  Free=6
+[08:59:36.750] [DISK] D:/RaspberryPi/Raspberry_Pi_CM5/TcpLogger/LOG/20260806/LOG_00000005.bin  256.00 MB
+[08:59:36.750] [BUFFER] Release Buffer #5  Free=7
+[08:59:36.751] [STAT] Write Speed=0.78 MB/s  Total=256.00 MB  Files=5  Queue=0
+[08:59:46.001] [SOCKET] Client Disconnected : 127.0.0.1
+[08:59:46.006] [DISK] D:/RaspberryPi/Raspberry_Pi_CM5/TcpLogger/LOG/20260806/LOG_00000006.bin  7.39 MB
+[08:59:46.006] [BUFFER] Release Buffer #6  Free=8
+[08:59:56.079] [INFO] Stopping Server...
+[08:59:56.080] [INFO] TcpServer Shutdown Requested
+[08:59:56.186] [INFO] TcpServer Stopped
+[08:59:56.187] [INFO] DiskWriter Shutdown Requested
+[08:59:56.187] [INFO] RingBuffer Stopped
+[08:59:56.187] [INFO] DiskWriter Thread Exit
+[08:59:56.188] [INFO] DiskWriter Stopped
+[08:59:56.188] [SUCCESS] Server Stopped
+```
+## 解說
+
+**從你現在提供的 Client + Server 兩邊實際測試結果來看，我認為第一階段的核心目標已經達成。**
+
+而且這次不是「看起來可以」，而是已經有完整的實測證據：
+
+```text
+Windows TcpDataClient
+        │
+        │ 800 bytes / 1 ms
+        │ ~999 packets/sec
+        ▼
+Windows TcpLogger
+        │
+        │ TCP
+        ▼
+BufferPool
+        │
+        ▼
+DiskWriter
+        │
+        ▼
+LOG_00000001.bin
+256.00 MB
+```
+
+---
+
+# 一、Server log 已經證明什麼？
+
+最關鍵的是這幾行：
+
+```text
+[08:32:22.685] [SOCKET] Client Connected : 127.0.0.1
+[08:32:22.685] [BUFFER] Acquire Buffer #1  Free=7
+```
+
+代表 Client 成功連線，而且 Server 開始取得第一個 256 MB Buffer。
+
+接下來大約 5 分 26 秒後：
+
+```text
+[08:37:49.070] [BUFFER] Acquire Buffer #2  Free=6
+[08:37:49.335] [DISK] .../LOG_00000001.bin  256.00 MB
+[08:37:49.336] [BUFFER] Release Buffer #1  Free=7
+[08:37:49.336] [STAT] Write Speed=0.77 MB/s  Total=256.00 MB  Files=1  Queue=0
+```
+
+這幾行非常重要。
+
+它證明：
+
+### ① 第一個 256 MB Buffer 已經填滿
+
+```text
+Buffer #1
+```
+
+從：
+
+```text
+08:32:22.685
+```
+
+到：
+
+```text
+08:37:49.070
+```
+
+約：
+
+```text
+5 分 26 秒
+```
+
+這和我們從 Client 的：
+
+```text
+~800,000 bytes/sec payload
+```
+
+預估的時間幾乎完全吻合。
+
+---
+
+### ② Server 成功建立 256 MB binary file
+
+```text
+LOG_00000001.bin  256.00 MB
+```
+
+這是第一階段最重要的驗收結果。
+
+不是只有收到資料，而是：
+
+```text
+TCP
+ ↓
+BufferPool
+ ↓
+DiskWriter
+ ↓
+256 MB binary file
+```
+
+整條鏈路已經跑通。
+
+---
+
+### ③ Buffer rollover 已經開始工作
+
+這一行：
+
+```text
+[BUFFER] Acquire Buffer #2  Free=6
+```
+
+非常重要。
+
+代表：
+
+```text
+Buffer #1
+    ↓
+填滿 256 MB
+    ↓
+交給 DiskWriter
+    ↓
+開始使用 Buffer #2
+```
+
+也就是我們原本設計的：
+
+```text
+Buffer #1 → File #1
+Buffer #2 → File #2
+Buffer #3 → File #3
+...
+```
+
+已經開始按照設計運作。
+
+---
+
+### ④ DiskWriter 成功寫出檔案
+
+```text
+[DISK] ... LOG_00000001.bin 256.00 MB
+```
+
+以及：
+
+```text
+[STAT] Write Speed=0.77 MB/s
+[STAT] Total=256.00 MB
+[STAT] Files=1
+[STAT] Queue=0
+```
+
+這也很漂亮。
+
+尤其：
+
+```text
+Queue=0
+```
+
+表示目前測試中 DiskWriter 沒有產生持續性的 backlog。
+
+---
+
+# 二、因此第一階段可以宣布 PASS
+
+我們原本定義的第一階段：
+
+```text
+電腦內部自測
+
+Windows TcpDataClient
+        ↓
+TCP
+        ↓
+Windows TcpLogger Server
+        ↓
+BufferPool
+        ↓
+DiskWriter
+        ↓
+每 256 MB 建立一個檔案
+```
+
+現在實際結果：
+
+| 測試項目                           | 結果        |
+| ------------------------------ | --------- |
+| Client 800-byte payload        | ✅ PASS    |
+| Client 1 ms interval           | ✅ PASS    |
+| 約 1000 packet/s                | ✅ PASS    |
+| Protocol packet 824 bytes      | ✅ PASS    |
+| TCP localhost 傳輸               | ✅ PASS    |
+| Server 接收                      | ✅ PASS    |
+| BufferPool                     | ✅ PASS    |
+| RingBuffer                     | ✅ PASS    |
+| DiskWriter                     | ✅ PASS    |
+| 256 MB file creation           | ✅ PASS    |
+| Buffer #1 → Buffer #2 rollover | ✅ PASS    |
+| `LOG_00000001.bin`             | ✅ 256 MB  |
+| Queue 穩定性                      | ✅ Queue=0 |
+
+所以我會正式把目前狀態定義為：
+
+> **第一階段：Windows Client → Windows TcpLogger Server 本機整合測試 PASS。**
+
+---
+
+# 三、不過有一個小地方我要精確說明
+
+我們原始的完整需求還包括：
+
+> 如果 TCP 被中斷，未滿 256 MB 的剩餘資料也必須保存成最後一個檔案。
+
+**這一項目前這份 log 還沒有測到。**
+
+目前我們已經驗證：
+
+```text
+256 MB
+→
+完整檔案
+```
+
+也驗證了：
+
+```text
+Buffer #1
+→
+Buffer #2
+```
+
+但還沒有在這次測試中驗證：
+
+```text
+例如：
+
+256 MB
++
+173 MB
++
+Ctrl+C / TCP disconnect
+        ↓
+LOG_00000001.bin 256 MB
+LOG_00000002.bin 173 MB
+```
+
+所以我會把第一階段分成：
+
+### 核心資料傳輸與 256 MB 切檔
+
+**PASS ✅**
+
+### 中斷時最後不足 256 MB 的檔案保存
+
+**尚待專門驗證 ⏳**
+
+這不影響我們說「第一階段核心整合成功」，但 README 裡最好誠實記錄。
+
+---
+
+# 四、這次 Client 修改的真正原因
+
+昨天 Client 曾經出現：
+
+```text
+Rate=64 pkt/s
+```
+
+目標卻是：
+
+```text
+1000 pkt/s
+```
+
+當時 MainLoop 已經證明：
+
+```text
+~100,000,000 loops/sec
+```
+
+所以我們判斷：
+
+> 問題不是 MainLoop 執行速度不足。
+
+接著檢查 Client 的時間控制。
+
+原本 Windows 平台使用：
+
+```c
+GetTickCount64()
+```
+
+來取得毫秒時間。
+
+這對一般 Windows 應用程式的時間測量沒有問題，但我們現在的需求是：
+
+```text
+1 ms periodic transmission
+```
+
+需要更高解析度的時間基準。
+
+因此我們沒有修改整個 TcpClient 架構，而是**只修改 Platform Time Layer**。
+
+---
+
+# 五、這次的修改方式
+
+原本概念：
+
+```text
+Windows
+    ↓
+GetTickCount64()
+    ↓
+毫秒時間
+    ↓
+1 ms scheduler
+```
+
+修改成：
+
+```text
+Windows
+    ↓
+QueryPerformanceCounter()
+    ↓
+QueryPerformanceFrequency()
+    ↓
+高解析度時間
+    ↓
+1 ms scheduler
+```
+
+使用：
+
+```c
+static LARGE_INTEGER s_qpc_frequency;
+```
+
+初始化時：
+
+```c
+QueryPerformanceFrequency(
+    &s_qpc_frequency);
+```
+
+取得目前時間：
+
+```c
+QueryPerformanceCounter(
+    &counter);
+```
+
+再將 counter 轉換成毫秒：
+
+```c
+((uint64_t)counter.QuadPart * 1000ULL) /
+(uint64_t)s_qpc_frequency.QuadPart;
+```
+
+---
+
+# 六、最重要的是：我們沒有破壞原本架構
+
+這一點我非常建議 README 記錄。
+
+這次不是：
+
+```text
+❌ 重寫 TcpClient
+❌ 修改 protocol
+❌ 修改 packet size
+❌ 修改 send architecture
+❌ 修改 Server
+❌ 加入 Windows-specific code 到核心 TCP logic
+```
+
+而是：
+
+```text
+Platform-specific time implementation
+```
+
+也就是：
+
+```text
+tcp_client.c
+        │
+        ├── Windows
+        │      └── QueryPerformanceCounter()
+        │
+        ├── Linux
+        │      └── Linux time implementation
+        │
+        └── STM32
+               └── STM32 platform timer
+```
+
+這符合我們原本的：
+
+```text
+Cross Platform
+Single Responsibility
+Platform Abstraction
+```
+
+設計原則。
+
+---
+
+# 七、這次修改後的實際改善
+
+修改前：
+
+```text
+Payload = 800 bytes
+Interval = 1 ms
+
+實際：
+~64 packets/sec
+~52.7 KB/sec
+```
+
+修改後：
+
+```text
+Payload = 800 bytes
+Interval = 1 ms
+
+實際：
+~999 packets/sec
+~800 KB/sec payload
+~824 KB/sec total TCP data
+```
+
+改善非常巨大。
+
+大約：
+
+```text
+999 / 64
+≈ 15.6 倍
+```
+
+這也正好解釋了為什麼昨天看到：
+
+```text
+~64 packets/sec
+```
+
+會讓我們懷疑約：
+
+```text
+15.6 ms
+```
+
+的時間週期。
+
+---
+
+# 八、README 直接加入這一段
+
+這是可以直接放進 GitHub README 的正式版本：
+
+## Windows TCP Client Timing Improvement
+
+During the initial Windows integration test, the TcpDataClient was configured to transmit an 800-byte payload every 1 ms. However, the actual transmission rate was only approximately 64 packets/sec.
+
+The main loop was already running at approximately 100 million iterations/sec, so the main loop execution speed was not the limiting factor.
+
+### Root Cause
+
+The Windows platform timing implementation used `GetTickCount64()` as the time source for the 1 ms transmission scheduler.
+
+For a periodic transmission requirement of 1 ms, a higher-resolution performance counter is more appropriate.
+
+### Modification
+
+The Windows timing implementation in `tcp_client.c` was changed from `GetTickCount64()` to the Windows high-resolution performance counter API:
+
+* `QueryPerformanceFrequency()`
+* `QueryPerformanceCounter()`
+
+The counter frequency is initialized once during `tcp_client_initialize()`, and the current counter value is converted to milliseconds by integer arithmetic.
+
+The transmission scheduler itself was not redesigned.
+
+The existing scheduling mechanism using `next_send_time_ms` was retained:
+
+```c
+do
+{
+    s_client.next_send_time_ms +=
+        (uint64_t)s_client.config.send_interval_ms;
+
+} while (s_client.next_send_time_ms <= now);
+```
+
+This preserves the existing periodic scheduling architecture while providing a higher-resolution Windows time base.
+
+### Test Result
+
+Before the modification:
+
+```text
+Payload        : 800 bytes
+Interval       : 1 ms
+Actual Rate    : ~64 packets/sec
+Payload Rate   : ~52.7 KB/sec
+```
+
+After the modification:
+
+```text
+Payload        : 800 bytes
+Interval       : 1 ms
+Actual Rate    : ~999 packets/sec
+Payload Rate   : ~800 KB/sec
+Total TCP Rate : ~824 KB/sec
+```
+
+A continuous local Windows test successfully transmitted approximately 40,000 packets while maintaining approximately 999 packets/sec.
+
+### Integration Test Result
+
+The Windows TcpDataClient was then tested against the Windows TcpLogger server using:
+
+```text
+TcpDataClient
+    |
+    | TCP / 127.0.0.1:7777
+    v
+TcpLogger
+    |
+    v
+BufferPool
+    |
+    v
+DiskWriter
+    |
+    v
+256 MB binary file
+```
+
+The server successfully received the continuous data stream and generated:
+
+```text
+LOG_00000001.bin    256.00 MB
+```
+
+The BufferPool also successfully transitioned from Buffer #1 to Buffer #2 after the first 256 MB buffer was completed.
+
+### Current Status
+
+**Phase 1 — Windows Client/Server Local Integration Test: PASS**
+
+Verified:
+
+* 800-byte application payload
+* 1 ms transmission interval
+* Approximately 1000 packets/sec
+* 824-byte complete protocol packet
+* Continuous TCP transmission
+* Windows TcpLogger server reception
+* BufferPool operation
+* RingBuffer operation
+* DiskWriter operation
+* 256 MB binary file generation
+* Buffer rollover to the next buffer
+
+The remaining dedicated test is graceful handling of a TCP interruption while the current buffer contains less than 256 MB. The incomplete final data must be preserved as the final binary file.
+
+---
+
+# 九、我特別建議保留這次測試數據
+
+不要只在 README 寫：
+
+```text
+Phase 1 PASS
+```
+
+這次其實很值得留下實際數據。
+
+尤其是：
+
+```text
+Client:
+~999 pkt/s
+```
+
+以及：
+
+```text
+Server:
+LOG_00000001.bin 256.00 MB
+```
+
+這兩個數據放在一起非常有說服力。
+
+因為它證明不是只有：
+
+> Client 說自己送了。
+
+而是：
+
+> **Client 實際以約 1 ms 週期傳送，Server 實際接收並最終寫出了 256 MB binary file。**
+
+---
+
+## 現在的專案進度
+
+我會把目前進度定義為：
+
+```text
+Phase 1
+Windows Client
+     ↓
+Windows TcpLogger
+     ↓
+256 MB File
+     ↓
+             ✅ PASS
+```
+
+下一個我們應該驗證的是同一個 Phase 1 的最後一個邊界案例：
+
+```text
+Client 持續傳送
+     ↓
+尚未滿 256 MB
+     ↓
+Ctrl+C / TCP disconnect
+     ↓
+Server flush remaining data
+     ↓
+產生最後不足 256 MB 的 bin
+```
+
+**這項測試完成後，我就會認為 Phase 1 的功能驗收真正完整。**
+
+然後才進入我們原本規劃的：
+
+```text
+Phase 2
+Windows TcpDataClient
+        ↓
+Ethernet
+        ↓
+Raspberry Pi CM5 TcpLogger
+```
+
+這樣的順序是最穩妥的，現在**完全不需要因為速度問題去修改 Client 或 Server 核心程式**。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

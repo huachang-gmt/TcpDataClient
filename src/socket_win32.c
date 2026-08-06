@@ -20,6 +20,8 @@
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <windows.h>
+#include <stdio.h>
 
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -148,6 +150,12 @@ tcp_result_t socket_if_send(
 
     SOCKET sock;
 
+
+    LARGE_INTEGER frequency;
+    LARGE_INTEGER start;
+    LARGE_INTEGER end;
+
+
     if (handle.native_handle ==
         SOCKET_HANDLE_INVALID)
     {
@@ -168,6 +176,19 @@ tcp_result_t socket_if_send(
     sock =
         (SOCKET)(uintptr_t)
         handle.native_handle;
+
+
+    /*
+     * Measure the actual time spent inside
+     * the Windows send() operation.
+     */
+    QueryPerformanceFrequency(
+        &frequency);
+
+    QueryPerformanceCounter(
+        &start);
+
+
 
     while (total_sent < length)
     {
@@ -196,6 +217,52 @@ tcp_result_t socket_if_send(
 
         total_sent +=
             (uint32_t)sent;
+    }
+
+
+    QueryPerformanceCounter(
+        &end);
+
+
+    /*
+     * Diagnostic:
+     *
+     * The actual duration is intentionally
+     * calculated here. We will later remove
+     * this diagnostic after identifying the
+     * transmission bottleneck.
+     */
+    {
+        uint64_t elapsed_us;
+
+        elapsed_us =
+            ((uint64_t)(
+                end.QuadPart -
+                start.QuadPart) *
+             1000000ULL) /
+            (uint64_t)frequency.QuadPart;
+
+        /*
+         * Only diagnostic output for now.
+         *
+         * Do not print every packet because that
+         * would itself destroy the 1 ms timing.
+         */
+        if (elapsed_us > 5000ULL)
+        {
+            char message[128];
+
+            (void)snprintf(
+                message,
+                sizeof(message),
+                "[SOCKET] send() blocked %llu us, length=%u",
+                (unsigned long long)elapsed_us,
+                (unsigned int)length);
+
+            printf(
+                "%s\n",
+                message);
+        }
     }
 
     return TCP_RESULT_OK;

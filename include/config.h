@@ -65,8 +65,9 @@
  * Number of packets to send.
  *
  * 0 = Infinite
+ * 1000ULL 只傳 1000 個 packet      TCP_DEFAULT_PACKET_COUNT 
  */
-#define TCP_DEFAULT_PACKET_COUNT              (1000ULL)
+#define TCP_DEFAULT_PACKET_COUNT              (TCP_PACKET_COUNT_INFINITE)
 
 #define TCP_PACKET_COUNT_INFINITE             (0ULL)
 
