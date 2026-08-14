@@ -1,4 +1,11 @@
+# 關於本程式
 
+> 本程式只能在電腦端執行，而且必須是執行 `x64 Native Tools Command Prompt for VS` 後開啟的視窗內。不能使用一般 Windows CMD 視窗或是 Power Shell 執行，因為有 連結編譯問題。
+
+- 執行路徑 ： D:\RaspberryPi\Raspberry_Pi_CM5\TcpDataClient>TcpDataClient.exe
+- 目前 (2026-08-14) 已經證明使用本程式 可以與 電腦版 TcpLogger.exe 與 樹莓派 .\TcpLogger 搭配 。
+- TCP Server 電腦版執行路徑 ： D:\RaspberryPi\Raspberry_Pi_CM5\TcpLogger>build\TcpLogger.exe
+- 其他詳細資料可以看 https://github.com/huachang-gmt/TcpLogger   與 https://github.com/huachang-gmt/TcpLogger-CM5
 
 
 ### 1. 我知道我們現在在哪裡
